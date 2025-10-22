@@ -898,10 +898,23 @@
 
             const encodedMessage = encodeURIComponent(message);
             
-            // استخدام رابط ويب واتساب بدلاً من wa.me
-            window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            // محاولة فتح تطبيق واتساب مباشرة
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
-            showToast('✅ تم فتح واتساب ويب مع محتوى البلاغ', 'success');
+            if (isMobile) {
+                // على الجوال، حاول فتح التطبيق أولاً
+                window.location.href = `whatsapp://send?text=${encodedMessage}`;
+                
+                // إذا لم يفتح التطبيق خلال ثانيتين، افتح رابط الويب
+                setTimeout(function() {
+                    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+                }, 2000);
+            } else {
+                // على الكمبيوتر، افتح رابط الويب مباشرة
+                window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            }
+            
+            showToast('✅ تم فتح واتساب مع محتوى البلاغ', 'success');
         }
 
         function showToast(message, type = 'success') {
