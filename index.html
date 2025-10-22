@@ -28,19 +28,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        input, select, textarea, button {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
         }
 
         body {
@@ -50,7 +37,7 @@
             line-height: 1.6;
             padding: 10px;
             min-height: 100vh;
-            -webkit-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%; /* منع تغيير حجم النص تلقائياً على iOS */
         }
 
         .container {
@@ -159,17 +146,18 @@
         input, select, textarea {
             width: 100%;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 16px; /* تحسين لمنع التكبير التلقائي على iOS */
             padding: 14px 12px;
             border: 2px solid var(--gray-dark);
             border-radius: var(--radius);
             transition: var(--transition);
             background: var(--white);
-            -webkit-appearance: none;
+            -webkit-appearance: none; /* إزالة المظهر الافتراضي على iOS */
             -moz-appearance: none;
             appearance: none;
         }
 
+        /* تحسين مظهر select على الجوال */
         select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -220,8 +208,6 @@
             justify-content: center;
             min-width: 50px;
             font-size: 1.2rem;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         .input-btn:hover {
@@ -240,7 +226,7 @@
 
         button {
             font-family: inherit;
-            font-size: 16px;
+            font-size: 16px; /* تحسين حجم الخط للأزرار على الجوال */
             padding: 14px 20px;
             border: none;
             border-radius: var(--radius);
@@ -253,15 +239,7 @@
             font-weight: 600;
             position: relative;
             overflow: hidden;
-            min-height: 50px;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
+            min-height: 50px; /* ارتفاع مناسب للجوال */
         }
 
         button::before {
@@ -280,7 +258,7 @@
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: translateY(2px);
         }
 
         .btn-primary {
@@ -323,7 +301,7 @@
         }
 
         .action-group button {
-            flex: 1;
+            flex: 1; /* جعل الأزرار تأخذ نفس العرض */
         }
 
         .toast {
@@ -419,6 +397,7 @@
         .priority-stop { background: #f3e5f5; color: #7b1fa2; }
         .priority-violation { background: #f3e5f5; color: #9c27b0; }
 
+        /* تحسينات إضافية للشاشات المتوسطة والكبيرة */
         @media (min-width: 768px) {
             body {
                 padding: 20px;
@@ -461,6 +440,7 @@
             }
         }
 
+        /* تحسينات للشاشات الصغيرة جداً */
         @media (max-width: 360px) {
             .logo {
                 font-size: 1.3rem;
@@ -476,6 +456,7 @@
             }
         }
 
+        /* تحسينات للوضع الأفقي على الجوال */
         @media (max-height: 500px) and (orientation: landscape) {
             body {
                 padding: 5px;
@@ -529,7 +510,7 @@
                                 maxlength="4"
                                 placeholder="مثال: 1234"
                                 title="يجب أن يكون 4 أرقام فقط"
-                                inputmode="numeric"
+                                inputmode="numeric" <!-- تحسين لوحة المفاتيح على الجوال -->
                             >
                             <div class="help-text">
                                 <span>ℹ️</span>
@@ -658,7 +639,7 @@
                                 pattern="^(05)[0-9]{8}$"
                                 placeholder="05XXXXXXXX"
                                 title="يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"
-                                inputmode="tel"
+                                inputmode="tel" <!-- تحسين لوحة المفاتيح على الجوال -->
                             >
                             <div class="help-text">
                                 <span>📱</span>
@@ -677,7 +658,7 @@
                         </button>
                     </div>
                     <div class="action-group">
-                        <button type="reset" class="btn-secondary" id="resetBtn">
+                        <button type="reset" class="btn-secondary">
                             <span>↶</span>
                             <span>إلغاء</span>
                         </button>
@@ -707,9 +688,6 @@
         const CONFIG = {
             APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSOHar4tKwJWgoJjLT9jvNfr2r0Yk8tVe_BYeubOFDW-bUhxHGeQFLzYaHnz4hVwyFyQ/exec'
         };
-
-        // متغير لمنع الإرسال المزدوج
-        let isSubmitting = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -755,21 +733,8 @@
             // WhatsApp Button
             document.getElementById('whatsappBtn').addEventListener('click', sendToWhatsApp);
 
-            // Form Submit - استخدام onclick مباشرة
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.addEventListener('click', handleSubmit, { passive: false });
-            
-            // Form Submit - أيضاً من خلال الفورم
-            document.getElementById('reportForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleSubmit(e);
-            });
-            
-            // Reset button
-            document.getElementById('resetBtn').addEventListener('click', function() {
-                document.getElementById('reportForm').reset();
-                showToast('تم إلغاء النموذج', 'info');
-            });
+            // Form Submit
+            document.getElementById('reportForm').addEventListener('submit', handleSubmit);
 
             // Number inputs validation
             document.getElementById('busNumber').addEventListener('input', function() {
@@ -809,9 +774,9 @@
             const formData = new FormData(form);
             const data = {};
             
-            for (let [key, value] of formData.entries()) {
-                data[key] = value.trim();
-            }
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
 
             // Handle "أخرى" fault type
             if (data.faultType === 'أخرى' && data.otherType) {
@@ -852,19 +817,8 @@
         }
 
         async function handleSubmit(e) {
-            // منع السلوك الافتراضي إذا كان event
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            // منع الإرسال المزدوج
-            if (isSubmitting) {
-                showToast('جاري معالجة البلاغ السابق...', 'info');
-                return;
-            }
-            
-            // التحقق من الصحة
+            e.preventDefault();
+
             const errors = validateForm();
             if (errors.length > 0) {
                 showToast(errors.join('\n'), 'error');
@@ -874,50 +828,24 @@
             const data = getFormData();
             
             try {
-                // تعيين حالة الإرسال
-                isSubmitting = true;
-                
-                // تعطيل الزر أثناء الإرسال
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span>⏳</span><span>جاري الحفظ...</span>';
-                
                 showLoading(true);
                 
-                // إرسال البيانات
                 const response = await submitToGoogleSheets(data);
                 
                 showLoading(false);
                 showToast('✅ تم حفظ البلاغ بنجاح', 'success');
                 
-                // إعادة تعيين النموذج
                 document.getElementById('reportForm').reset();
-                
-                // إعادة تعيين حالة الحقول المخفية
-                document.getElementById('detailsGroup').style.display = 'none';
-                document.getElementById('phoneGroup').style.display = 'none';
-                document.getElementById('otherTypeGroup').style.display = 'none';
                 
             } catch (error) {
                 showLoading(false);
                 showToast('❌ فشل في حفظ البلاغ: ' + error.message, 'error');
-            } finally {
-                // إعادة تعيين حالة الإرسال
-                isSubmitting = false;
-                
-                // إعادة تمكين الزر
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>💾</span><span>حفظ البلاغ</span>';
             }
         }
 
         async function submitToGoogleSheets(data) {
-            // إضافة timestamp لمنع التخزين المؤقت
-            const timestamp = new Date().getTime();
             const url = new URL(CONFIG.APPS_SCRIPT_URL);
             url.searchParams.set('action', 'addReport');
-            url.searchParams.set('timestamp', timestamp);
             
             Object.keys(data).forEach(key => {
                 if (data[key]) {
@@ -925,15 +853,7 @@
                 }
             });
 
-            // استخدام fetch مع خيارات محسنة
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await fetch(url);
             
             if (!response.ok) {
                 throw new Error(`خطأ في الاتصال: ${response.status}`);
@@ -981,22 +901,7 @@
             message += `_تم إنشاء البلاغ عبر نظام إدارة بلاغات الحافلات_`;
 
             const encodedMessage = encodeURIComponent(message);
-            
-            // محاولة فتح تطبيق واتساب مباشرة
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // على الجوال، حاول فتح التطبيق أولاً
-                window.location.href = `whatsapp://send?text=${encodedMessage}`;
-                
-                // إذا لم يفتح التطبيق خلال ثانيتين، افتح رابط الويب
-                setTimeout(function() {
-                    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-                }, 2000);
-            } else {
-                // على الكمبيوتر، افتح رابط الويب مباشرة
-                window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
-            }
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
             
             showToast('✅ تم فتح واتساب مع محتوى البلاغ', 'success');
         }
