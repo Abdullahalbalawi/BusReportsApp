@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة بلاغات الحافلات</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #1976d2;
+            --primary-dark: #1565c0;
+            --primary-light: #e3f2fd;
+            --danger: #e53935;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --violation: #9c27b0;
+            --whatsapp: #25D366;
+            --gray: #f4f6f9;
+            --gray-dark: #e0e0e0;
+            --text: #333;
+            --white: #fff;
+            --shadow: 0 3px 8px rgba(0,0,0,0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 10px;
+            min-height: 100vh;
+            -webkit-text-size-adjust: 100%; /* منع تغيير حجم النص تلقائياً على iOS */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 20px 15px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .form-container {
+            background: var(--white);
+            padding: 20px 15px;
+            border-radius: 0 0 var(--radius) var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gray);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        label .required {
+            color: var(--danger);
+            margin-right: 3px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            font-family: inherit;
+            font-size: 16px; /* تحسين لمنع التكبير التلقائي على iOS */
+            padding: 14px 12px;
+            border: 2px solid var(--gray-dark);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            background: var(--white);
+            -webkit-appearance: none; /* إزالة المظهر الافتراضي على iOS */
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        /* تحسين مظهر select على الجوال */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            background-size: 12px;
+            padding-left: 35px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        input:invalid:not(:placeholder-shown) {
+            border-color: var(--danger);
+        }
+
+        input:valid:not(:placeholder-shown) {
+            border-color: var(--success);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-btn {
+            padding: 0 15px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+            font-size: 1.2rem;
+        }
+
+        .input-btn:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        button {
+            font-family: inherit;
+            font-size: 16px; /* تحسين حجم الخط للأزرار على الجوال */
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            min-height: 50px; /* ارتفاع مناسب للجوال */
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 15px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray-dark) 0%, #bdbdbd 100%);
+            color: var(--text);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, var(--whatsapp) 0%, #128C7E 100%);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--gray);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-group button {
+            flex: 1; /* جعل الأزرار تأخذ نفس العرض */
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: 20px;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: none;
+            font-size: 0.9rem;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success) 0%, #388e3c 100%);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        .loading-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--gray);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .priority-normal { background: #e8f5e9; color: #2e7d32; }
+        .priority-medium { background: #fff3e0; color: #ef6c00; }
+        .priority-high { background: #ffebee; color: #c62828; }
+        .priority-stop { background: #f3e5f5; color: #7b1fa2; }
+        .priority-violation { background: #f3e5f5; color: #9c27b0; }
+
+        /* تحسينات إضافية للشاشات المتوسطة والكبيرة */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .form-container {
+                padding: 30px;
+            }
+            
+            .form-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .action-group {
+                flex-direction: row;
+            }
+            
+            .action-group button {
+                flex: none;
+            }
+            
+            .toast {
+                right: 30px;
+                left: auto;
+                max-width: 400px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* تحسينات للشاشات الصغيرة جداً */
+        @media (max-width: 360px) {
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+            
+            button {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+        }
+
+        /* تحسينات للوضع الأفقي على الجوال */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 5px;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .form-section {
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+            }
+            
+            .section-title {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span>🚍</span>
+                <span>نظام إدارة بلاغات الحافلات</span>
+            </div>
+            <div class="subtitle">تسجيل البلاغات وإدارتها بسهولة وفعالية</div>
+        </header>
+
+        <div class="form-container">
+            <form id="reportForm">
+                <!-- معلومات الحافلة -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span>🚍</span>
+                        <span>معلومات الحافلة</span>
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="busNumber">
+                                <span class="required">*</span>
+                                رقم الحافلة
+                            </label>
+                            <input 
+                                type="text" 
+                                id="busNumber" 
+                                name="busNumber" 
+                                required 
+                                pattern="[0-9]{4}"
+                                maxlength="4"
+                                placeholder="مثال: 1234"
+                                title="يجب أن يكون 4 أرقام فقط"
+                                inputmode="numeric" <!-- تحسين لوحة المفاتيح على الجوال -->
+                            >
+                            <div class="help-text">
+                                <span>ℹ️</span>
+                                <span>أدخل 4 أرقام فقط</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">
+                                <span class="required">*</span>
+                                مستوى الأهمية
+                            </label>
+                            <select id="priority" name="priority" required>
+                                <option value="">اختر مستوى الأهمية</option>
+                                <option value="عادي">🟢 عادي</option>
+                                <option value="متوسط">🟡 متوسط</option>
+                                <option value="عالي">🔴 عالي</option>
+                                <option value="مسار متوقف">🚨 مسار متوقف</option>
+                                <option value="مخالفة تطوير">🟣 مخالفة تطوير</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تفاصيل العطل -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span>🔧</span>
+                        <span>تفاصيل العطل</span>
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="faultType">
+                                <span class="required">*</span>
+                                نوع العطل
+                            </label>
+                            <select id="faultType" name="faultType" required>
+                                <option value="">اختر نوع العطل</option>
+                                <option value="ميكانيكي">⚙️ ميكانيكي</option>
+                                <option value="كهربائي">⚡ كهربائي</option>
+                                <option value="تكييف">❄️ تكييف</option>
+                                <option value="إطارات"> 🛞  إطارات</option>
+                                <option value="فرامل">🛑 فرامل</option>
+                                <option value="محرك">🔧 محرك</option>
+                                <option value="مخالفة تطوير">🟣 مخالفة تطوير</option>
+                                <option value="أخرى">📋 أخرى</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="otherTypeGroup" style="display: none;">
+                            <label for="otherType">
+                                حدد نوع العطل الآخر
+                            </label>
+                            <input 
+                                type="text" 
+                                id="otherType" 
+                                name="otherType"
+                                placeholder="أدخل نوع العطل"
+                            >
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="faultDescription">
+                                <span class="required">*</span>
+                                وصف العطل
+                            </label>
+                            <textarea 
+                                id="faultDescription" 
+                                name="faultDescription" 
+                                required
+                                placeholder="أدخل وصفاً تفصيلياً للعطل..."
+                            ></textarea>
+                            <div class="help-text">
+                                <span>💡</span>
+                                <span>كن محدداً قدر الإمكان لتسريع عملية الإصلاح</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- معلومات الموقع -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span>🌎</span>
+                        <span>معلومات الموقع</span>
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="location">
+                                <span class="required">*</span>
+                                الموقع الحالي
+                            </label>
+                            <select id="location" name="location" required>
+                                <option value="">اختر الموقع</option>
+                                <option value="داخل الكراج">🏢 داخل الكراج</option>
+                                <option value="خارج الكراج">🛣️ خارج الكراج</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width" id="detailsGroup" style="display: none;">
+                            <label for="detailedLocation">
+                                الموقع التفصيلي
+                            </label>
+                            <div class="input-group">
+                                <input 
+                                    type="text" 
+                                    id="detailedLocation" 
+                                    name="detailedLocation"
+                                    placeholder="الصق رابط الموقع أو استخدم زر تحديد الموقع"
+                                >
+                                <button type="button" class="input-btn" id="getLocationBtn" title="تحديد موقعي الحالي">
+                                    🌍
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width" id="phoneGroup" style="display: none;">
+                            <label for="phoneNumber">
+                                <span class="required">*</span>
+                                رقم الجوال
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phoneNumber" 
+                                name="phoneNumber"
+                                pattern="^(05)[0-9]{8}$"
+                                placeholder="05XXXXXXXX"
+                                title="يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"
+                                inputmode="tel" <!-- تحسين لوحة المفاتيح على الجوال -->
+                            >
+                            <div class="help-text">
+                                <span>📱</span>
+                                <span>يبدأ بـ 05 ويتكون من 10 أرقام</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار الإجراءات -->
+                <div class="form-actions">
+                    <div class="action-group">
+                        <button type="button" class="btn-whatsapp" id="whatsappBtn">
+                            <span>💬</span>
+                            <span>إرسال إلى واتساب</span>
+                        </button>
+                    </div>
+                    <div class="action-group">
+                        <button type="reset" class="btn-secondary">
+                            <span>↶</span>
+                            <span>إلغاء</span>
+                        </button>
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <span>💾</span>
+                            <span>حفظ البلاغ</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p style="font-size: 1.1rem; font-weight: 600;">جاري حفظ البلاغ...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSOHar4tKwJWgoJjLT9jvNfr2r0Yk8tVe_BYeubOFDW-bUhxHGeQFLzYaHnz4hVwyFyQ/exec'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Fault Type Change
+            document.getElementById('faultType').addEventListener('change', function() {
+                const otherGroup = document.getElementById('otherTypeGroup');
+                otherGroup.style.display = this.value === 'أخرى' ? 'block' : 'none';
+                
+                // إذا تم اختيار "مخالفة تطوير" في نوع العطل، يتم تعيين مستوى الأهمية تلقائياً
+                if (this.value === 'مخالفة تطوير') {
+                    document.getElementById('priority').value = 'مخالفة تطوير';
+                }
+            });
+
+            // Priority Change
+            document.getElementById('priority').addEventListener('change', function() {
+                // إذا تم اختيار "مخالفة تطوير" في مستوى الأهمية، يتم تعيين نوع العطل تلقائياً
+                if (this.value === 'مخالفة تطوير') {
+                    document.getElementById('faultType').value = 'مخالفة تطوير';
+                }
+            });
+
+            // Location Change
+            document.getElementById('location').addEventListener('change', function() {
+                const detailsGroup = document.getElementById('detailsGroup');
+                const phoneGroup = document.getElementById('phoneGroup');
+                const showDetails = this.value === 'خارج الكراج';
+                
+                detailsGroup.style.display = showDetails ? 'block' : 'none';
+                phoneGroup.style.display = showDetails ? 'block' : 'none';
+                
+                const phoneInput = document.getElementById('phoneNumber');
+                phoneInput.required = showDetails;
+            });
+
+            // Get Location Button
+            document.getElementById('getLocationBtn').addEventListener('click', getCurrentLocation);
+
+            // WhatsApp Button
+            document.getElementById('whatsappBtn').addEventListener('click', sendToWhatsApp);
+
+            // Form Submit
+            document.getElementById('reportForm').addEventListener('submit', handleSubmit);
+
+            // Number inputs validation
+            document.getElementById('busNumber').addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            document.getElementById('phoneNumber').addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                showToast('المتصفح لا يدعم تحديد الموقع', 'error');
+                return;
+            }
+
+            showLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    document.getElementById('detailedLocation').value = 
+                        `https://www.google.com/maps?q=${lat},${lon}`;
+                    showLoading(false);
+                    showToast('تم إضافة الموقع بنجاح ✅', 'success');
+                },
+                (error) => {
+                    showLoading(false);
+                    showToast('فشل تحديد الموقع. تحقق من أذونات الموقع', 'error');
+                }
+            );
+        }
+
+        function getFormData() {
+            const form = document.getElementById('reportForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // Handle "أخرى" fault type
+            if (data.faultType === 'أخرى' && data.otherType) {
+                data.faultType = data.otherType;
+            }
+            delete data.otherType;
+
+            return data;
+        }
+
+        function validateForm() {
+            const data = getFormData();
+            const errors = [];
+
+            if (!data.busNumber || !/^[0-9]{4}$/.test(data.busNumber)) {
+                errors.push('رقم الحافلة يجب أن يكون 4 أرقام');
+            }
+
+            if (!data.faultType) {
+                errors.push('يجب اختيار نوع العطل');
+            }
+
+            if (!data.faultDescription || data.faultDescription.trim().length < 10) {
+                errors.push('وصف العطل يجب أن يكون 10 أحرف على الأقل');
+            }
+
+            if (!data.location) {
+                errors.push('يجب اختيار الموقع');
+            }
+
+            if (data.location === 'خارج الكراج') {
+                if (!data.phoneNumber || !/^(05)[0-9]{8}$/.test(data.phoneNumber)) {
+                    errors.push('رقم الجوال يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام');
+                }
+            }
+
+            return errors;
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast(errors.join('\n'), 'error');
+                return;
+            }
+
+            const data = getFormData();
+            
+            try {
+                showLoading(true);
+                
+                const response = await submitToGoogleSheets(data);
+                
+                showLoading(false);
+                showToast('✅ تم حفظ البلاغ بنجاح', 'success');
+                
+                document.getElementById('reportForm').reset();
+                
+            } catch (error) {
+                showLoading(false);
+                showToast('❌ فشل في حفظ البلاغ: ' + error.message, 'error');
+            }
+        }
+
+        async function submitToGoogleSheets(data) {
+            const url = new URL(CONFIG.APPS_SCRIPT_URL);
+            url.searchParams.set('action', 'addReport');
+            
+            Object.keys(data).forEach(key => {
+                if (data[key]) {
+                    url.searchParams.set(key, data[key]);
+                }
+            });
+
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`خطأ في الاتصال: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.status !== 'success') {
+                throw new Error(result.message || 'خطأ غير معروف');
+            }
+
+            return result;
+        }
+
+        function sendToWhatsApp() {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast('يرجى ملء جميع الحقول المطلوبة أولاً', 'error');
+                return;
+            }
+
+            const data = getFormData();
+            
+            let message = `🚌 *بلاغ عطل حافلة*\n\n`;
+            message += `*رقم الحافلة:* ${data.busNumber}\n`;
+            message += `*نوع العطل:* ${data.faultType}\n`;
+            message += `*وصف العطل:* ${data.faultDescription}\n`;
+            message += `*الموقع:* ${data.location}\n`;
+            
+            if (data.detailedLocation) {
+                message += `*الموقع التفصيلي:* ${data.detailedLocation}\n`;
+            }
+            
+            if (data.phoneNumber) {
+                message += `*رقم الجوال:* ${data.phoneNumber}\n`;
+            }
+            
+            message += `*مستوى الأهمية:* ${data.priority}\n\n`;
+            
+            // إضافة ملاحظة خاصة لمخالفة التطوير
+            if (data.priority === 'مخالفة تطوير') {
+                message += `⚠️ *ملاحظة:* هذا البلاغ له أولوية قصوى (15 دقيقة فقط للإصلاح)\n\n`;
+            }
+            
+            message += `_تم إنشاء البلاغ عبر نظام إدارة بلاغات الحافلات_`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            
+            showToast('✅ تم فتح واتساب مع محتوى البلاغ', 'success');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `<span>${icons[type] || '✅'}</span><span>${message}</span>`;
+            toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 4000);
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+    </script>
+</body>
+</html>
