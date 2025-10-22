@@ -37,7 +37,7 @@
             line-height: 1.6;
             padding: 10px;
             min-height: 100vh;
-            -webkit-text-size-adjust: 100%; /* منع تغيير حجم النص تلقائياً على iOS */
+            -webkit-text-size-adjust: 100%;
         }
 
         .container {
@@ -146,18 +146,17 @@
         input, select, textarea {
             width: 100%;
             font-family: inherit;
-            font-size: 16px; /* تحسين لمنع التكبير التلقائي على iOS */
+            font-size: 16px;
             padding: 14px 12px;
             border: 2px solid var(--gray-dark);
             border-radius: var(--radius);
             transition: var(--transition);
             background: var(--white);
-            -webkit-appearance: none; /* إزالة المظهر الافتراضي على iOS */
+            -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
         }
 
-        /* تحسين مظهر select على الجوال */
         select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -226,7 +225,7 @@
 
         button {
             font-family: inherit;
-            font-size: 16px; /* تحسين حجم الخط للأزرار على الجوال */
+            font-size: 16px;
             padding: 14px 20px;
             border: none;
             border-radius: var(--radius);
@@ -239,7 +238,7 @@
             font-weight: 600;
             position: relative;
             overflow: hidden;
-            min-height: 50px; /* ارتفاع مناسب للجوال */
+            min-height: 50px;
         }
 
         button::before {
@@ -301,7 +300,7 @@
         }
 
         .action-group button {
-            flex: 1; /* جعل الأزرار تأخذ نفس العرض */
+            flex: 1;
         }
 
         .toast {
@@ -397,7 +396,6 @@
         .priority-stop { background: #f3e5f5; color: #7b1fa2; }
         .priority-violation { background: #f3e5f5; color: #9c27b0; }
 
-        /* تحسينات إضافية للشاشات المتوسطة والكبيرة */
         @media (min-width: 768px) {
             body {
                 padding: 20px;
@@ -440,7 +438,6 @@
             }
         }
 
-        /* تحسينات للشاشات الصغيرة جداً */
         @media (max-width: 360px) {
             .logo {
                 font-size: 1.3rem;
@@ -456,7 +453,6 @@
             }
         }
 
-        /* تحسينات للوضع الأفقي على الجوال */
         @media (max-height: 500px) and (orientation: landscape) {
             body {
                 padding: 5px;
@@ -510,7 +506,7 @@
                                 maxlength="4"
                                 placeholder="مثال: 1234"
                                 title="يجب أن يكون 4 أرقام فقط"
-                                inputmode="numeric" <!-- تحسين لوحة المفاتيح على الجوال -->
+                                inputmode="numeric"
                             >
                             <div class="help-text">
                                 <span>ℹ️</span>
@@ -639,7 +635,7 @@
                                 pattern="^(05)[0-9]{8}$"
                                 placeholder="05XXXXXXXX"
                                 title="يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"
-                                inputmode="tel" <!-- تحسين لوحة المفاتيح على الجوال -->
+                                inputmode="tel"
                             >
                             <div class="help-text">
                                 <span>📱</span>
@@ -901,9 +897,11 @@
             message += `_تم إنشاء البلاغ عبر نظام إدارة بلاغات الحافلات_`;
 
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
             
-            showToast('✅ تم فتح واتساب مع محتوى البلاغ', 'success');
+            // استخدام رابط ويب واتساب بدلاً من wa.me
+            window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            
+            showToast('✅ تم فتح واتساب ويب مع محتوى البلاغ', 'success');
         }
 
         function showToast(message, type = 'success') {
