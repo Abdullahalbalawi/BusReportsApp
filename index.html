@@ -28,6 +28,19 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, select, textarea, button {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         body {
@@ -207,6 +220,8 @@
             justify-content: center;
             min-width: 50px;
             font-size: 1.2rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .input-btn:hover {
@@ -239,6 +254,14 @@
             position: relative;
             overflow: hidden;
             min-height: 50px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         button::before {
@@ -257,7 +280,7 @@
         }
 
         button:active {
-            transform: translateY(2px);
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -654,7 +677,7 @@
                         </button>
                     </div>
                     <div class="action-group">
-                        <button type="reset" class="btn-secondary">
+                        <button type="reset" class="btn-secondary" id="resetBtn">
                             <span>↶</span>
                             <span>إلغاء</span>
                         </button>
@@ -684,6 +707,9 @@
         const CONFIG = {
             APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSOHar4tKwJWgoJjLT9jvNfr2r0Yk8tVe_BYeubOFDW-bUhxHGeQFLzYaHnz4hVwyFyQ/exec'
         };
+
+        // متغير لمنع الإرسال المزدوج
+        let isSubmitting = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -729,8 +755,21 @@
             // WhatsApp Button
             document.getElementById('whatsappBtn').addEventListener('click', sendToWhatsApp);
 
-            // Form Submit
-            document.getElementById('reportForm').addEventListener('submit', handleSubmit);
+            // Form Submit - استخدام onclick مباشرة
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.addEventListener('click', handleSubmit, { passive: false });
+            
+            // Form Submit - أيضاً من خلال الفورم
+            document.getElementById('reportForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleSubmit(e);
+            });
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                document.getElementById('reportForm').reset();
+                showToast('تم إلغاء النموذج', 'info');
+            });
 
             // Number inputs validation
             document.getElementById('busNumber').addEventListener('input', function() {
@@ -770,9 +809,9 @@
             const formData = new FormData(form);
             const data = {};
             
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+            for (let [key, value] of formData.entries()) {
+                data[key] = value.trim();
+            }
 
             // Handle "أخرى" fault type
             if (data.faultType === 'أخرى' && data.otherType) {
@@ -813,8 +852,19 @@
         }
 
         async function handleSubmit(e) {
-            e.preventDefault();
-
+            // منع السلوك الافتراضي إذا كان event
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // منع الإرسال المزدوج
+            if (isSubmitting) {
+                showToast('جاري معالجة البلاغ السابق...', 'info');
+                return;
+            }
+            
+            // التحقق من الصحة
             const errors = validateForm();
             if (errors.length > 0) {
                 showToast(errors.join('\n'), 'error');
@@ -824,24 +874,50 @@
             const data = getFormData();
             
             try {
+                // تعيين حالة الإرسال
+                isSubmitting = true;
+                
+                // تعطيل الزر أثناء الإرسال
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>⏳</span><span>جاري الحفظ...</span>';
+                
                 showLoading(true);
                 
+                // إرسال البيانات
                 const response = await submitToGoogleSheets(data);
                 
                 showLoading(false);
                 showToast('✅ تم حفظ البلاغ بنجاح', 'success');
                 
+                // إعادة تعيين النموذج
                 document.getElementById('reportForm').reset();
+                
+                // إعادة تعيين حالة الحقول المخفية
+                document.getElementById('detailsGroup').style.display = 'none';
+                document.getElementById('phoneGroup').style.display = 'none';
+                document.getElementById('otherTypeGroup').style.display = 'none';
                 
             } catch (error) {
                 showLoading(false);
                 showToast('❌ فشل في حفظ البلاغ: ' + error.message, 'error');
+            } finally {
+                // إعادة تعيين حالة الإرسال
+                isSubmitting = false;
+                
+                // إعادة تمكين الزر
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>💾</span><span>حفظ البلاغ</span>';
             }
         }
 
         async function submitToGoogleSheets(data) {
+            // إضافة timestamp لمنع التخزين المؤقت
+            const timestamp = new Date().getTime();
             const url = new URL(CONFIG.APPS_SCRIPT_URL);
             url.searchParams.set('action', 'addReport');
+            url.searchParams.set('timestamp', timestamp);
             
             Object.keys(data).forEach(key => {
                 if (data[key]) {
@@ -849,7 +925,15 @@
                 }
             });
 
-            const response = await fetch(url);
+            // استخدام fetch مع خيارات محسنة
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             
             if (!response.ok) {
                 throw new Error(`خطأ في الاتصال: ${response.status}`);
