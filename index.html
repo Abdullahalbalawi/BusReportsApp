@@ -3,24 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bus Reports Management System / نظام إدارة بلاغات الحافلات</title>
+    <title>نموذج الابلاغ عن الاعطال</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    
     <style>
-        :root {
-            --primary: #2c5aa0;
-            --primary-dark: #1e3d72;
-            --secondary: #4caf50;
-            --danger: #f44336;
-            --warning: #ff9800;
-            --info: #2196f3;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --gray: #6c757d;
-            --border: #dee2e6;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -28,131 +14,105 @@
         }
 
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        body[dir="rtl"] {
             font-family: 'Cairo', sans-serif;
-        }
-
-        body[dir="ltr"] {
-            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            animation: slideDown 0.5s ease-out;
         }
 
-        .language-switcher {
-            display: flex;
-            justify-content: flex-end;
-            padding: 15px 20px;
-            background: #f1f5f9;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .lang-btn {
-            background: white;
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .lang-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .lang-btn.active {
-            background: var(--primary);
-            color: white;
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px 30px;
+            padding: 30px;
             text-align: center;
         }
 
         .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
         }
 
-        .logo span:first-child {
+        .logo span:first-child::before {
+            content: '🚍';
             font-size: 2.5rem;
         }
 
-        .logo span:last-child {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
         .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 400;
         }
 
         .form-container {
-            padding: 30px;
+            padding: 40px;
         }
 
         .form-section {
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
         }
 
         .section-title {
-            background-color: #f1f5f9;
-            padding: 15px 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section-title span:first-child::before {
+            content: '';
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            padding: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
         }
 
         .form-group.full-width {
@@ -161,29 +121,40 @@
 
         label {
             font-weight: 600;
-            color: var(--dark);
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         .required {
-            color: var(--danger);
+            color: #e53e3e;
+            font-size: 1.2rem;
         }
 
-        input, select, textarea {
+        input[type="text"],
+        input[type="tel"],
+        select,
+        textarea {
+            width: 100%;
             padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             font-size: 1rem;
-            transition: all 0.3s;
-            background-color: white;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         textarea {
@@ -191,13 +162,22 @@
             resize: vertical;
         }
 
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            padding-left: 40px;
+        }
+
         .help-text {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 5px;
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.85rem;
-            color: var(--gray);
-            margin-top: 5px;
         }
 
         .input-group {
@@ -210,68 +190,76 @@
         }
 
         .input-btn {
-            background: var(--primary);
+            padding: 12px 20px;
+            background: #667eea;
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 0 15px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.3s;
             font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-btn::before {
+            content: '📍';
         }
 
         .input-btn:hover {
-            background: var(--primary-dark);
+            background: #5568d3;
+            transform: translateY(-2px);
         }
 
         .form-actions {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 30px;
-        }
-
-        @media (max-width: 576px) {
-            .form-actions {
-                flex-direction: column;
-            }
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
         }
 
         .action-group {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         button {
-            width: 100%;
-            padding: 14px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
+        .btn-primary span:first-child::before {
+            content: '📝';
         }
 
         .btn-whatsapp {
-            background: #25D366;
+            background: #25d366;
             color: white;
         }
 
-        .btn-whatsapp:hover {
-            background: #128C7E;
+        .btn-whatsapp span:first-child::before {
+            content: '📱';
         }
 
         .loading-overlay {
@@ -282,26 +270,25 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 9999;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
         }
 
         .loading-content {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
-            box-shadow: var(--shadow);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
             width: 50px;
             height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
@@ -313,70 +300,95 @@
 
         .toast {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
+            bottom: -100px;
             right: 20px;
-            max-width: 400px;
-            margin: 0 auto;
             background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
-            gap: 10px;
-            transform: translateY(100px);
-            opacity: 0;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+            z-index: 10000;
             transition: all 0.3s ease;
-            z-index: 1001;
+            max-width: 400px;
         }
 
         .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+            bottom: 20px;
         }
 
         .toast.success {
-            border-right: 4px solid var(--secondary);
+            border-right: 5px solid #48bb78;
         }
 
         .toast.error {
-            border-right: 4px solid var(--danger);
+            border-right: 5px solid #f56565;
         }
 
         .toast.info {
-            border-right: 4px solid var(--info);
+            border-right: 5px solid #4299e1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+            }
         }
     </style>
 </head>
-<body dir="rtl">
+<body>
     <div class="container">
-        <div class="language-switcher">
-            <button class="lang-btn active" id="arBtn">🇸🇦 العربية</button>
-            <button class="lang-btn" id="enBtn">🇺🇸 English</button>
-        </div>
-        
         <header>
             <div class="logo">
-                <span>🚍</span>
-                <span data-ar="نظام إدارة بلاغات الحافلات" data-en="Bus Reports Management System">نظام إدارة بلاغات الحافلات</span>
+                <span></span>
+                <span>نظام إدارة بلاغات الحافلات</span>
             </div>
-            <div class="subtitle" data-ar="تسجيل البلاغات وإدارتها بسهولة وفعالية" data-en="Register and manage reports easily and effectively">تسجيل البلاغات وإدارتها بسهولة وفعالية</div>
+            <div class="subtitle">تسجيل البلاغات وإدارتها بسهولة وفعالية</div>
         </header>
 
         <div class="form-container">
             <form id="reportForm">
-                <!-- معلومات الحافلة / Bus Information -->
+                <!-- معلومات الحافلة -->
                 <div class="form-section">
                     <h3 class="section-title">
-                        <span>🚍</span>
-                        <span data-ar="معلومات الحافلة" data-en="Bus Information">معلومات الحافلة</span>
+                        <span>🚌</span>
+                        <span>معلومات الحافلة</span>
                     </h3>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="busNumber">
                                 <span class="required">*</span>
-                                <span data-ar="رقم الحافلة" data-en="Bus Number">رقم الحافلة</span>
+                                رقم الحافلة
                             </label>
                             <input 
                                 type="text" 
@@ -385,126 +397,121 @@
                                 required 
                                 pattern="[0-9]{4}"
                                 maxlength="4"
-                                data-ar-placeholder="مثال: 1234"
-                                data-en-placeholder="Example: 1234"
-                                title="يجب أن يكون 4 أرقام فقط / Must be 4 digits only"
+                                placeholder="مثال: 1234"
+                                title="يجب أن يكون 4 أرقام فقط"
                             >
                             <div class="help-text">
-                                <span>ℹ️</span>
-                                <span data-ar="أدخل 4 أرقام فقط" data-en="Enter 4 digits only">أدخل 4 أرقام فقط</span>
+                                <span></span>
+                                <span>أدخل 4 أرقام فقط</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="priority">
                                 <span class="required">*</span>
-                                <span data-ar="مستوى الأهمية" data-en="Priority Level">مستوى الأهمية</span>
+                                مستوى الأهمية
                             </label>
                             <select id="priority" name="priority" required>
-                                <option value="" data-ar="اختر مستوى الأهمية" data-en="Select Priority Level">اختر مستوى الأهمية</option>
-                                <option value="عادي" data-ar="🟢 عادي" data-en="🟢 Normal">🟢 عادي</option>
-                                <option value="متوسط" data-ar="🟡 متوسط" data-en="🟡 Medium">🟡 متوسط</option>
-                                <option value="عالي" data-ar="🔴 عالي" data-en="🔴 High">🔴 عالي</option>
-                                <option value="مسار متوقف" data-ar="🚨 مسار متوقف" data-en="🚨 Route Stopped">🚨 مسار متوقف</option>
-                                <option value="مخالفة تطوير" data-ar="🟣 مخالفة تطوير" data-en="🟣 Development Violation">🟣 مخالفة تطوير</option>
+                                <option value="">اختر مستوى الأهمية</option>
+                                <option value="عادي">🟢 عادي</option>
+                                <option value="متوسط">🟡 متوسط</option>
+                                <option value="عالي">🔴 عالي</option>
+                                <option value="مسار متوقف">🚨 مسار متوقف</option>
+                                <option value="مخالفة تطوير">🟣 مخالفة تطوير</option>
                             </select>
+                           
                         </div>
                     </div>
                 </div>
 
-                <!-- تفاصيل العطل / Fault Details -->
+                <!-- تفاصيل العطل -->
                 <div class="form-section">
                     <h3 class="section-title">
                         <span>🔧</span>
-                        <span data-ar="تفاصيل العطل" data-en="Fault Details">تفاصيل العطل</span>
+                        <span>تفاصيل العطل</span>
                     </h3>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="faultType">
                                 <span class="required">*</span>
-                                <span data-ar="نوع العطل" data-en="Fault Type">نوع العطل</span>
+                                نوع العطل
                             </label>
                             <select id="faultType" name="faultType" required>
-                                <option value="" data-ar="اختر نوع العطل" data-en="Select Fault Type">اختر نوع العطل</option>
-                                <option value="ميكانيكي" data-ar="⚙️ ميكانيكي" data-en="⚙️ Mechanical">⚙️ ميكانيكي</option>
-                                <option value="كهربائي" data-ar="⚡ كهربائي" data-en="⚡ Electrical">⚡ كهربائي</option>
-                                <option value="تكييف" data-ar="❄️ تكييف" data-en="❄️ Air Conditioning">❄️ تكييف</option>
-                                <option value="إطارات" data-ar="🛞 إطارات" data-en="🛞 Tires">🛞 إطارات</option>
-                                <option value="فرامل" data-ar="🛑 فرامل" data-en="🛑 Brakes">🛑 فرامل</option>
-                                <option value="محرك" data-ar="🔧 محرك" data-en="🔧 Engine">🔧 محرك</option>
-                                <option value="مخالفة تطوير" data-ar="🟣 مخالفة تطوير" data-en="🟣 Development Violation">🟣 مخالفة تطوير</option>
-                                <option value="أخرى" data-ar="📋 أخرى" data-en="📋 Other">📋 أخرى</option>
+                                <option value="">اختر نوع العطل</option>
+                                <option value="ميكانيكي">⚙️ ميكانيكي</option>
+                                <option value="كهربائي">⚡ كهربائي</option>
+                                <option value="تكييف">❄️ تكييف</option>
+                                <option value="إطارات"> 🛞  إطارات</option>
+                                <option value="فرامل">🛑 فرامل</option>
+                                <option value="محرك">🔧 محرك</option>
+                                <option value="مخالفة تطوير">🟣 مخالفة تطوير</option>
+                                <option value="أخرى">📋 أخرى</option>
                             </select>
                         </div>
 
                         <div class="form-group" id="otherTypeGroup" style="display: none;">
-                            <label for="otherType" data-ar="حدد نوع العطل الآخر" data-en="Specify Other Fault Type">
-                                <span data-ar="حدد نوع العطل الآخر" data-en="Specify Other Fault Type">حدد نوع العطل الآخر</span>
+                            <label for="otherType">
+                                حدد نوع العطل الآخر
                             </label>
                             <input 
                                 type="text" 
                                 id="otherType" 
                                 name="otherType"
-                                data-ar-placeholder="أدخل نوع العطل"
-                                data-en-placeholder="Enter fault type"
+                                placeholder="أدخل نوع العطل"
                             >
                         </div>
 
                         <div class="form-group full-width">
                             <label for="faultDescription">
                                 <span class="required">*</span>
-                                <span data-ar="وصف العطل" data-en="Fault Description">وصف العطل</span>
+                                وصف العطل
                             </label>
                             <textarea 
                                 id="faultDescription" 
                                 name="faultDescription" 
                                 required
-                                data-ar-placeholder="أدخل وصفاً تفصيلياً للعطل..."
-                                data-en-placeholder="Enter a detailed description of the fault..."
+                                placeholder="أدخل وصفاً تفصيلياً للعطل..."
                             ></textarea>
                             <div class="help-text">
                                 <span>💡</span>
-                                <span data-ar="كن محدداً قدر الإمكان لتسريع عملية الإصلاح" data-en="Be as specific as possible to speed up the repair process">كن محدداً قدر الإمكان لتسريع عملية الإصلاح</span>
+                                <span>كن محدداً قدر الإمكان لتسريع عملية الإصلاح</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- معلومات الموقع / Location Information -->
+                <!-- معلومات الموقع -->
                 <div class="form-section">
                     <h3 class="section-title">
-                        <span>🌎</span>
-                        <span data-ar="معلومات الموقع" data-en="Location Information">معلومات الموقع</span>
+                        <span>🌐</span>
+                        <span>معلومات الموقع</span>
                     </h3>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="location">
                                 <span class="required">*</span>
-                                <span data-ar="الموقع الحالي" data-en="Current Location">الموقع الحالي</span>
+                                الموقع الحالي
                             </label>
                             <select id="location" name="location" required>
-                                <option value="" data-ar="اختر الموقع" data-en="Select Location">اختر الموقع</option>
-                                <option value="داخل الكراج" data-ar="🏢 داخل الكراج" data-en="🏢 Inside Garage">🏢 داخل الكراج</option>
-                                <option value="خارج الكراج" data-ar="🛣️ خارج الكراج" data-en="🛣️ Outside Garage">🛣️ خارج الكراج</option>
+                                <option value="">اختر الموقع</option>
+                                <option value="داخل الكراج"> داخل الكراج</option>
+                                <option value="خارج الكراج"> خارج الكراج</option>
                             </select>
                         </div>
 
                         <div class="form-group full-width" id="detailsGroup" style="display: none;">
-                            <label for="detailedLocation" data-ar="الموقع التفصيلي" data-en="Detailed Location">
-                                <span data-ar="الموقع التفصيلي" data-en="Detailed Location">الموقع التفصيلي</span>
+                            <label for="detailedLocation">
+                                الموقع التفصيلي
                             </label>
                             <div class="input-group">
                                 <input 
                                     type="text" 
                                     id="detailedLocation" 
                                     name="detailedLocation"
-                                    data-ar-placeholder="الصق رابط الموقع أو استخدم زر تحديد الموقع"
-                                    data-en-placeholder="Paste location link or use location button"
+                                    placeholder="الصق رابط الموقع أو استخدم زر تحديد الموقع"
                                 >
-                                <button type="button" class="input-btn" id="getLocationBtn" 
-                                        data-ar-title="تحديد موقعي الحالي"
-                                        data-en-title="Get My Current Location">
-                                    🌍
+                                <button type="button" class="input-btn" id="getLocationBtn" title="تحديد موقعي الحالي">
+                                    
                                 </button>
                             </div>
                         </div>
@@ -512,37 +519,37 @@
                         <div class="form-group full-width" id="phoneGroup" style="display: none;">
                             <label for="phoneNumber">
                                 <span class="required">*</span>
-                                <span data-ar="رقم الجوال" data-en="Mobile Number">رقم الجوال</span>
+                                رقم الجوال
                             </label>
                             <input 
                                 type="tel" 
                                 id="phoneNumber" 
                                 name="phoneNumber"
                                 pattern="^(05)[0-9]{8}$"
-                                data-ar-placeholder="05XXXXXXXX"
-                                data-en-placeholder="05XXXXXXXX"
-                                title="يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام / Must start with 05 and contain 10 digits"
+                                placeholder="05XXXXXXXX"
+                                title="يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"
                             >
                             <div class="help-text">
                                 <span>📱</span>
-                                <span data-ar="يبدأ بـ 05 ويتكون من 10 أرقام" data-en="Starts with 05 and consists of 10 digits">يبدأ بـ 05 ويتكون من 10 أرقام</span>
+                                <span>يبدأ بـ 05 ويتكون من 10 أرقام</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- أزرار الإجراءات / Action Buttons -->
+                <!-- أزرار الإجراءات -->
                 <div class="form-actions">
                     <div class="action-group">
                         <button type="button" class="btn-whatsapp" id="whatsappBtn">
-                            <span>📱</span>
-                            <span data-ar="إرسال إلى واتساب" data-en="Send to WhatsApp">إرسال إلى واتساب</span>
+                            <span></span>
+                            <span>إرسال إلى واتساب</span>
                         </button>
                     </div>
                     <div class="action-group">
+					
                         <button type="submit" class="btn-primary" id="submitBtn">
-                            <span>📨</span>
-                            <span data-ar="ارسال البلاغ" data-en="Submit Report">ارسال البلاغ</span>
+                            <span></span>
+                            <span>ارسال البلاغ</span>
                         </button>
                     </div>
                 </div>
@@ -554,7 +561,7 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <p style="font-size: 1.1rem; font-weight: 600;" data-ar="جاري حفظ البلاغ..." data-en="Saving report...">جاري حفظ البلاغ...</p>
+            <p style="font-size: 1.1rem; font-weight: 600;">جاري حفظ البلاغ...</p>
         </div>
     </div>
 
@@ -567,54 +574,10 @@
             APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSOHar4tKwJWgoJjLT9jvNfr2r0Yk8tVe_BYeubOFDW-bUhxHGeQFLzYaHnz4hVwyFyQ/exec'
         };
 
-        // Language management
-        let currentLang = 'ar';
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            setupLanguageSwitcher();
         });
-
-        function setupLanguageSwitcher() {
-            document.getElementById('arBtn').addEventListener('click', function() {
-                switchLanguage('ar');
-            });
-
-            document.getElementById('enBtn').addEventListener('click', function() {
-                switchLanguage('en');
-            });
-        }
-
-        function switchLanguage(lang) {
-            currentLang = lang;
-            
-            // Update document direction
-            document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
-            // Update active button
-            document.getElementById('arBtn').classList.toggle('active', lang === 'ar');
-            document.getElementById('enBtn').classList.toggle('active', lang === 'en');
-            
-            // Update all translatable elements
-            document.querySelectorAll('[data-ar], [data-en]').forEach(element => {
-                if (element.tagName === 'OPTION') {
-                    element.textContent = element.getAttribute(`data-${lang}`);
-                } else {
-                    element.textContent = element.getAttribute(`data-${lang}`);
-                }
-            });
-            
-            // Update placeholders
-            document.querySelectorAll('[data-ar-placeholder], [data-en-placeholder]').forEach(element => {
-                element.placeholder = element.getAttribute(`data-${lang}-placeholder`);
-            });
-            
-            // Update titles
-            document.querySelectorAll('[data-ar-title], [data-en-title]').forEach(element => {
-                element.title = element.getAttribute(`data-${lang}-title`);
-            });
-        }
 
         function setupEventListeners() {
             // Fault Type Change
@@ -670,10 +633,7 @@
 
         function getCurrentLocation() {
             if (!navigator.geolocation) {
-                showToast(
-                    currentLang === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support location detection', 
-                    'error'
-                );
+                showToast('المتصفح لا يدعم تحديد الموقع', 'error');
                 return;
             }
 
@@ -685,54 +645,13 @@
                     document.getElementById('detailedLocation').value = 
                         `https://www.google.com/maps?q=${lat},${lon}`;
                     showLoading(false);
-                    showToast(
-                        currentLang === 'ar' ? 'تم إضافة الموقع بنجاح ✅' : 'Location added successfully ✅', 
-                        'success'
-                    );
+                    showToast('تم إضافة الموقع بنجاح ✅', 'success');
                 },
                 (error) => {
                     showLoading(false);
-                    showToast(
-                        currentLang === 'ar' ? 'فشل تحديد الموقع. تحقق من أذونات الموقع' : 'Failed to get location. Check location permissions', 
-                        'error'
-                    );
+                    showToast('فشل تحديد الموقع. تحقق من أذونات الموقع', 'error');
                 }
             );
-        }
-
-        function sendToWhatsApp() {
-            const errors = validateForm();
-            if (errors.length > 0) {
-                showToast(errors.join('\n'), 'error');
-                return;
-            }
-
-            const data = getFormData();
-            let message;
-            
-            if (currentLang === 'ar') {
-                message = `بلاغ عطل حافلة:
-رقم الحافلة: ${data.busNumber}
-مستوى الأهمية: ${data.priority}
-نوع العطل: ${data.faultType}
-وصف العطل: ${data.faultDescription}
-الموقع: ${data.location}
-${data.detailedLocation ? `الموقع التفصيلي: ${data.detailedLocation}` : ''}
-${data.phoneNumber ? `رقم الجوال: ${data.phoneNumber}` : ''}`;
-            } else {
-                message = `Bus Fault Report:
-Bus Number: ${data.busNumber}
-Priority Level: ${data.priority}
-Fault Type: ${data.faultType}
-Fault Description: ${data.faultDescription}
-Location: ${data.location}
-${data.detailedLocation ? `Detailed Location: ${data.detailedLocation}` : ''}
-${data.phoneNumber ? `Mobile Number: ${data.phoneNumber}` : ''}`;
-            }
-
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
         }
 
         function getFormData() {
@@ -758,34 +677,24 @@ ${data.phoneNumber ? `Mobile Number: ${data.phoneNumber}` : ''}`;
             const errors = [];
 
             if (!data.busNumber || !/^[0-9]{4}$/.test(data.busNumber)) {
-                errors.push(currentLang === 'ar' ? 
-                    'رقم الحافلة يجب أن يكون 4 أرقام' : 
-                    'Bus number must be 4 digits');
+                errors.push('رقم الحافلة يجب أن يكون 4 أرقام');
             }
 
             if (!data.faultType) {
-                errors.push(currentLang === 'ar' ? 
-                    'يجب اختيار نوع العطل' : 
-                    'Fault type must be selected');
+                errors.push('يجب اختيار نوع العطل');
             }
 
             if (!data.faultDescription || data.faultDescription.trim().length < 10) {
-                errors.push(currentLang === 'ar' ? 
-                    'وصف العطل يجب أن يكون 10 أحرف على الأقل' : 
-                    'Fault description must be at least 10 characters');
+                errors.push('وصف العطل يجب أن يكون 10 أحرف على الأقل');
             }
 
             if (!data.location) {
-                errors.push(currentLang === 'ar' ? 
-                    'يجب اختيار الموقع' : 
-                    'Location must be selected');
+                errors.push('يجب اختيار الموقع');
             }
 
             if (data.location === 'خارج الكراج') {
                 if (!data.phoneNumber || !/^(05)[0-9]{8}$/.test(data.phoneNumber)) {
-                    errors.push(currentLang === 'ar' ? 
-                        'رقم الجوال يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام' : 
-                        'Mobile number must start with 05 and contain 10 digits');
+                    errors.push('رقم الجوال يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام');
                 }
             }
 
@@ -809,20 +718,13 @@ ${data.phoneNumber ? `Mobile Number: ${data.phoneNumber}` : ''}`;
                 const response = await submitToGoogleSheets(data);
                 
                 showLoading(false);
-                showToast(
-                    currentLang === 'ar' ? '✅ تم حفظ البلاغ بنجاح' : '✅ Report saved successfully', 
-                    'success'
-                );
+                showToast('✅ تم حفظ البلاغ بنجاح', 'success');
                 
                 document.getElementById('reportForm').reset();
                 
             } catch (error) {
                 showLoading(false);
-                showToast(
-                    currentLang === 'ar' ? '❌ فشل في حفظ البلاغ: ' + error.message : 
-                    '❌ Failed to save report: ' + error.message, 
-                    'error'
-                );
+                showToast('❌ فشل في حفظ البلاغ: ' + error.message, 'error');
             }
         }
 
@@ -851,6 +753,7 @@ ${data.phoneNumber ? `Mobile Number: ${data.phoneNumber}` : ''}`;
             return result;
         }
 
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const icons = {
@@ -870,12 +773,41 @@ ${data.phoneNumber ? `Mobile Number: ${data.phoneNumber}` : ''}`;
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = show ? 'flex' : 'none';
-            
-            // Update loading text based on current language
-            if (show) {
-                const loadingText = overlay.querySelector('p');
-                loadingText.textContent = currentLang === 'ar' ? 'جاري حفظ البلاغ...' : 'Saving report...';
+        }
+
+        function sendToWhatsApp() {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast(errors.join('\n'), 'error');
+                return;
             }
+
+            const data = getFormData();
+            
+            let message = `🚍 *بلاغ عطل حافلة*\n\n`;
+            message += `📋 *رقم الحافلة:* ${data.busNumber}\n`;
+            message += `🔧 *نوع العطل:* ${data.faultType}\n`;
+            message += `📝 *وصف العطل:* ${data.faultDescription}\n`;
+            message += `📍 *الموقع:* ${data.location}\n`;
+            message += `⚠️ *مستوى الأهمية:* ${data.priority}\n`;
+
+            if (data.location === 'خارج الكراج') {
+                if (data.detailedLocation) {
+                    message += `🗺️ *الموقع التفصيلي:* ${data.detailedLocation}\n`;
+                }
+                if (data.phoneNumber) {
+                    message += `📱 *رقم الجوال:* ${data.phoneNumber}\n`;
+                }
+            }
+            
+            message += `\n⏰ *وقت الإبلاغ:* ${new Date().toLocaleString('en-eg')}`;
+            
+             // Open WhatsApp with the message
+            const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+            window.open(whatsappURL, '_blank');
+            
+            
         }
     </script>
 </body>
