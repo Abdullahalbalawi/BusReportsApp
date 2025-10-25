@@ -225,6 +225,13 @@
         .btn-whatsapp span:first-child::before {
             content: '📱';
         }
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        .btn-secondary span:first-child::before {
+            content: '❌';
+        }
         .loading-overlay {
             display: none;
             position: fixed;
@@ -286,6 +293,115 @@
         .toast.info {
             border-right: 5px solid #4299e1;
         }
+        /* النموذج المنبثق لعرض تفاصيل البلاغ */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .report-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+        .modal-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            padding: 30px;
+        }
+        .report-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 4px solid #667eea;
+        }
+        .detail-label {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 0.9rem;
+        }
+        .detail-value {
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
         @media (max-width: 768px) {
             .container {
                 border-radius: 10px;
@@ -311,6 +427,12 @@
                 left: 10px;
                 max-width: calc(100% - 20px);
             }
+            .modal-content {
+                max-width: 100%;
+            }
+            .modal-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -325,6 +447,9 @@
         </header>
         <div class="form-container">
             <form id="reportForm">
+                <!-- حقل مخفي لحفظ رقم البلاغ -->
+                <input type="hidden" id="reportNumber" name="reportNumber">
+                
                 <!-- معلومات الحافلة -->
                 <div class="form-section">
                     <h3 class="section-title">
@@ -501,42 +626,57 @@
     </div>
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
+    <!-- Report Details Modal -->
+    <div class="report-modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" id="modalClose">×</button>
+                <h2>✅ تم حفظ البلاغ بنجاح</h2>
+                <p>تفاصيل البلاغ المدخل</p>
+            </div>
+            <div class="modal-body">
+                <div class="report-details" id="reportDetails">
+                    <!-- سيتم تعبئة تفاصيل البلاغ هنا -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="modalCancel">
+                        <span></span>
+                        <span>إغلاق</span>
+                    </button>
+                    <button class="btn-whatsapp" id="modalWhatsApp">
+                        <span></span>
+                        <span>إرسال إلى واتساب</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // Configuration
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSOHar4tKwJWgoJjLT9jvNfr2r0Yk8tVe_BYeubOFDW-bUhxHGeQFLzYaHnz4hVwyFyQ/exec'
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbymRaHFUJekEzPSgK6BOkO5aMiMBJY6vFajjnCcYtHg7S7ECDsONzCeMLPdY50xRjw7/exec'
         };
 
-        // دالة تنسيق الوقت لوتساب
-        function formatDateTimeForWhatsApp() {
-            const d = new Date();
-            const hours = d.getHours();
-            const minutes = String(d.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'م' : 'ص';
-            const displayHours = hours % 12 || 12;
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${day}-${month}-${year} ${displayHours}:${minutes} ${ampm}`;
-        }
+        // متغير لحفظ بيانات البلاغ الأخير
+        let lastReportData = null;
+        let lastReportNumber = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
         });
+
         function setupEventListeners() {
             // Fault Type Change
             document.getElementById('faultType').addEventListener('change', function() {
                 const otherGroup = document.getElementById('otherTypeGroup');
                 otherGroup.style.display = this.value === 'أخرى' ? 'block' : 'none';
-                // إذا تم اختيار "مخالفة تطوير" في نوع العطل، يتم تعيين مستوى الأهمية تلقائياً
                 if (this.value === 'مخالفة تطوير') {
                     document.getElementById('priority').value = 'مخالفة تطوير';
                 }
             });
             // Priority Change
             document.getElementById('priority').addEventListener('change', function() {
-                // إذا تم اختيار "مخالفة تطوير" في مستوى الأهمية، يتم تعيين نوع العطل تلقائياً
                 if (this.value === 'مخالفة تطوير') {
                     document.getElementById('faultType').value = 'مخالفة تطوير';
                 }
@@ -557,19 +697,34 @@
             document.getElementById('whatsappBtn').addEventListener('click', sendToWhatsApp);
             // Form Submit
             document.getElementById('reportForm').addEventListener('submit', handleSubmit);
-            // Number inputs validation
+            // Input sanitization
             document.getElementById('busNumber').addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
             document.getElementById('phoneNumber').addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
+            // Modal events
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            document.getElementById('modalCancel').addEventListener('click', closeModal);
+            document.getElementById('modalWhatsApp').addEventListener('click', sendModalToWhatsApp);
         }
+
         function getCurrentLocation() {
             if (!navigator.geolocation) {
                 showToast('المتصفح لا يدعم تحديد الموقع', 'error');
                 return;
             }
+
+            // ✅ تعيين الموقع تلقائيًا إلى "خارج الكراج"
+            const locationSelect = document.getElementById('location');
+            if (locationSelect.value !== 'خارج الكراج') {
+                locationSelect.value = 'خارج الكراج';
+                // ✅ تشغيل حدث change لعرض الحقول المطلوبة
+                const event = new Event('change', { bubbles: true });
+                locationSelect.dispatchEvent(event);
+            }
+
             showLoading(true);
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -586,6 +741,7 @@
                 }
             );
         }
+
         function getFormData() {
             const form = document.getElementById('reportForm');
             const formData = new FormData(form);
@@ -593,13 +749,13 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });
-            // Handle "أخرى" fault type
             if (data.faultType === 'أخرى' && data.otherType) {
                 data.faultType = data.otherType;
             }
             delete data.otherType;
             return data;
         }
+
         function validateForm() {
             const data = getFormData();
             const errors = [];
@@ -609,7 +765,7 @@
             if (!data.faultType) {
                 errors.push('يجب اختيار نوع العطل');
             }
-            if (!data.faultDescription || data.faultDescription.trim().length < 10) {
+            if (!data.faultDescription || data.faultDescription.trim().length < 5) {
                 errors.push('وصف العطل يجب أن يكون 10 أحرف على الأقل');
             }
             if (!data.location) {
@@ -622,6 +778,7 @@
             }
             return errors;
         }
+
         async function handleSubmit(e) {
             e.preventDefault();
             const errors = validateForm();
@@ -634,13 +791,19 @@
                 showLoading(true);
                 const response = await submitToGoogleSheets(data);
                 showLoading(false);
-                showToast('✅ تم حفظ البلاغ بنجاح', 'success');
-                document.getElementById('reportForm').reset();
+                
+                // حفظ بيانات البلاغ الأخير ورقم البلاغ الحقيقي من الخادم
+                lastReportData = data;
+                lastReportNumber = response.reportNumber;
+                
+                // عرض النموذج المنبثق مع تفاصيل البلاغ
+                showReportModal(data, lastReportNumber);
             } catch (error) {
                 showLoading(false);
                 showToast('❌ فشل في حفظ البلاغ: ' + error.message, 'error');
             }
         }
+
         async function submitToGoogleSheets(data) {
             const url = new URL(CONFIG.APPS_SCRIPT_URL);
             url.searchParams.set('action', 'addReport');
@@ -649,16 +812,166 @@
                     url.searchParams.set(key, data[key]);
                 }
             });
+            
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`خطأ في الاتصال: ${response.status}`);
             }
+            
             const result = await response.json();
             if (result.status !== 'success') {
                 throw new Error(result.message || 'خطأ غير معروف');
             }
+            
+            // الحصول على رقم البلاغ الحقيقي من الخادم
+            // نبحث عن البلاغ الجديد في البيانات المرجعة للحصول على رقمه
+            if (result.data && result.data.length > 0) {
+                // البحث عن أحدث بلاغ (آخر عنصر في المصفوفة)
+                const latestReport = result.data[result.data.length - 1];
+                if (latestReport && latestReport['رقم البلاغ']) {
+                    result.reportNumber = latestReport['رقم البلاغ'];
+                }
+            }
+            
             return result;
         }
+
+        function showReportModal(data, reportNumber) {
+            const modal = document.getElementById('reportModal');
+            const detailsContainer = document.getElementById('reportDetails');
+            
+            // إنشاء HTML لعرض تفاصيل البلاغ
+            const now = new Date();
+            const timeStr = formatDateTime(now);
+            
+            let detailsHTML = `
+                <div class="detail-item">
+                    <div class="detail-label">🚍 رقم البلاغ</div>
+                    <div class="detail-value">${reportNumber}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">🚌 رقم الحافلة</div>
+                    <div class="detail-value">${data.busNumber}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">🔧 نوع العطل</div>
+                    <div class="detail-value">${data.faultType}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">📝 وصف العطل</div>
+                    <div class="detail-value">${data.faultDescription}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">📍 الموقع</div>
+                    <div class="detail-value">${data.location}</div>
+                </div>
+            `;
+            
+            if (data.location === 'خارج الكراج') {
+                if (data.detailedLocation) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">🌍 الرابط</div>
+                            <div class="detail-value">
+                                <a href="${data.detailedLocation}" target="_blank">${data.detailedLocation}</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                if (data.phoneNumber) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">📞 الجوال</div>
+                            <div class="detail-value">${data.phoneNumber}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            detailsHTML += `
+                <div class="detail-item">
+                    <div class="detail-label">⚡ مستوى الأهمية</div>
+                    <div class="detail-value">${data.priority}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">🕓 وقت الإنشاء</div>
+                    <div class="detail-value">${timeStr}</div>
+                </div>
+            `;
+            
+            detailsContainer.innerHTML = detailsHTML;
+            modal.classList.add('show');
+            
+            // إعادة تعيين النموذج
+            document.getElementById('reportForm').reset();
+            document.getElementById('otherTypeGroup').style.display = 'none';
+            document.getElementById('detailsGroup').style.display = 'none';
+            document.getElementById('phoneGroup').style.display = 'none';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.remove('show');
+        }
+
+        // دالة لتنسيق التاريخ والوقت بالتنسيق المطلوب
+        function formatDateTime(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            
+            let hours = date.getHours();
+            let minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // الساعة 0 تصبح 12
+            
+            return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+        }
+
+        function sendModalToWhatsApp() {
+            if (!lastReportData || !lastReportNumber) return;
+            
+            const now = new Date();
+            const timeStr = formatDateTime(now);
+
+            let message = '';
+            if (lastReportData.location === 'داخل الكراج') {
+                message = `🔔 *بلاغ جديد تم تسجيله (داخل الكراج)*\n-\n`;
+                
+                message += `🚍 *رقم البلاغ:* ${lastReportNumber}\n`;
+                message += `🚌 *رقم الحافلة:* ${lastReportData.busNumber}\n`;
+                message += `🔧 *نوع العطل:* ${lastReportData.faultType}\n`;
+                message += `📝 *الوصف:* ${lastReportData.faultDescription}\n`;
+                message += `📍 *الموقع:* ${lastReportData.location}\n`;
+                message += `⚡ *الأهمية:* ${lastReportData.priority}\n`;
+                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
+                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
+            } else {
+                message = `🔔 *بلاغ جديد تم تسجيله (خارج الكراج)*\n-\n`;
+                
+                message += `🚍 *رقم البلاغ:* ${lastReportNumber}\n`;
+                message += `🚌 *رقم الحافلة:* ${lastReportData.busNumber}\n`;
+                message += `🔧 *نوع العطل:* ${lastReportData.faultType}\n`;
+                message += `📝 *الوصف:* ${lastReportData.faultDescription}\n`;
+                message += `📍 *الموقع:* ${lastReportData.location}\n`;
+                if (lastReportData.detailedLocation) {
+                    message += `🌍 *الرابط:* ${lastReportData.detailedLocation}\n`;
+                }
+                if (lastReportData.phoneNumber) {
+                    message += `📞 *الجوال:* ${lastReportData.phoneNumber}\n`;
+                }
+                message += `⚡ *الأهمية:* ${lastReportData.priority}\n`;
+                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
+                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
+            }
+
+            const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+            closeModal();
+        }
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const icons = {
@@ -672,10 +985,12 @@
                 toast.className = 'toast';
             }, 4000);
         }
+
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = show ? 'flex' : 'none';
         }
+
         function sendToWhatsApp() {
             const errors = validateForm();
             if (errors.length > 0) {
@@ -683,27 +998,43 @@
                 return;
             }
             const data = getFormData();
-            const isInside = data.location === 'داخل الكراج';
-            const reportId = isInside ? 'A-001' : 'B-001'; // رقم تقديري
+            const now = new Date();
+            const timeStr = formatDateTime(now);
 
-            let message = isInside 
-                ? `*🔔 بلاغ جديد تم تسجيله (داخل الكراج)*\n-\n`
-                : `*🔔 بلاغ جديد تم تسجيله (خارج الكراج)*\n-\n`;
+            // في هذه الحالة، لا يمكننا الحصول على رقم البلاغ الحقيقي لأنه لم يتم حفظه بعد
+            // لذلك نستخدم رقم مؤقت وسيتم استبداله بالرقم الحقيقي عند حفظ البلاغ
+            const tempReportNumber = "سيتم تعيين رقم عند الحفظ";
 
-            message += `🚍 رقم البلاغ: ${reportId}\n`
-            message += `🚌 رقم الحافلة: ${data.busNumber}\n`;
-            message += `🔧 نوع العطل: ${data.faultType}\n`;
-            message += `📝 الوصف: ${data.faultDescription}\n`;
-            message += `📍 الموقع: ${data.location}\n`;
-
-            if (!isInside) {
-                if (data.detailedLocation) message += `🌍 الرابط: ${data.detailedLocation}\n`;
-                if (data.phoneNumber) message += `📞 الجوال: ${data.phoneNumber}\n`;
+            let message = '';
+            if (data.location === 'داخل الكراج') {
+                message = `🔔 *بلاغ جديد تم تسجيله (داخل الكراج)*\n-\n`;
+                
+                message += `🚍 *رقم البلاغ:* ${tempReportNumber}\n`;
+                message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
+                message += `🔧 *نوع العطل:* ${data.faultType}\n`;
+                message += `📝 *الوصف:* ${data.faultDescription}\n`;
+                message += `📍 *الموقع:* ${data.location}\n`;
+                message += `⚡ *الأهمية:* ${data.priority}\n`;
+                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
+                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
+            } else {
+                message = `🔔 *بلاغ جديد تم تسجيله (خارج الكراج)*\n-\n`;
+                
+                message += `🚍 *رقم البلاغ:* ${tempReportNumber}\n`;
+                message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
+                message += `🔧 *نوع العطل:* ${data.faultType}\n`;
+                message += `📝 *الوصف:* ${data.faultDescription}\n`;
+                message += `📍 *الموقع:* ${data.location}\n`;
+                if (data.detailedLocation) {
+                    message += `🌍 *الرابط:* ${data.detailedLocation}\n`;
+                }
+                if (data.phoneNumber) {
+                    message += `📞 *الجوال:* ${data.phoneNumber}\n`;
+                }
+                message += `⚡ *الأهمية:* ${data.priority}\n`;
+                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
+                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
             }
-
-            message += `⚡ الأهمية: ${data.priority}\n`;
-            message += `🕓 وقت الإنشاء: ${formatDateTimeForWhatsApp()}\n\n`;
-            message += `⚙️ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
 
             const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(whatsappURL, '_blank');
