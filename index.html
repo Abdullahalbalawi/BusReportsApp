@@ -182,7 +182,7 @@
         }
         .form-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr;
             gap: 15px;
             margin-top: 30px;
             padding-top: 30px;
@@ -687,8 +687,6 @@
             });
             // Get Location Button
             document.getElementById('getLocationBtn').addEventListener('click', getCurrentLocation);
-            // WhatsApp Button
-            document.getElementById('whatsappBtn').addEventListener('click', sendToWhatsApp);
             // Form Submit
             document.getElementById('reportForm').addEventListener('submit', handleSubmit);
             // Input sanitization
@@ -983,55 +981,6 @@
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = show ? 'flex' : 'none';
-        }
-
-        function sendToWhatsApp() {
-            const errors = validateForm();
-            if (errors.length > 0) {
-                showToast(errors.join('\n'), 'error');
-                return;
-            }
-            const data = getFormData();
-            const now = new Date();
-            const timeStr = formatDateTime(now);
-
-            // في هذه الحالة، لا يمكننا الحصول على رقم البلاغ الحقيقي لأنه لم يتم حفظه بعد
-            // لذلك نستخدم رقم مؤقت وسيتم استبداله بالرقم الحقيقي عند حفظ البلاغ
-            const tempReportNumber = "سيتم تعيين رقم عند الحفظ";
-
-            let message = '';
-            if (data.location === 'داخل الكراج') {
-                message = `🔔 *بلاغ جديد تم تسجيله (داخل الكراج)*\n-\n`;
-                
-                message += `🚍 *رقم البلاغ:* ${tempReportNumber}\n`;
-                message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
-                message += `🔧 *نوع العطل:* ${data.faultType}\n`;
-                message += `📝 *الوصف:* ${data.faultDescription}\n`;
-                message += `📍 *الموقع:* ${data.location}\n`;
-                message += `⚡ *الأهمية:* ${data.priority}\n`;
-                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
-                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
-            } else {
-                message = `🔔 *بلاغ جديد تم تسجيله (خارج الكراج)*\n-\n`;
-                
-                message += `🚍 *رقم البلاغ:* ${tempReportNumber}\n`;
-                message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
-                message += `🔧 *نوع العطل:* ${data.faultType}\n`;
-                message += `📝 *الوصف:* ${data.faultDescription}\n`;
-                message += `📍 *الموقع:* ${data.location}\n`;
-                if (data.detailedLocation) {
-                    message += `🌍 *الرابط:* ${data.detailedLocation}\n`;
-                }
-                if (data.phoneNumber) {
-                    message += `📞 *الجوال:* ${data.phoneNumber}\n`;
-                }
-                message += `⚡ *الأهمية:* ${data.priority}\n`;
-                message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
-                message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
-            }
-
-            const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, '_blank');
         }
     </script>
 </body>
