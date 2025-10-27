@@ -180,6 +180,23 @@
             background: #5568d3;
             transform: translateY(-2px);
         }
+        .paste-btn {
+            padding: 12px 20px;
+            background: #ed8936;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .paste-btn::before {
+            content: '📋';
+        }
+        .paste-btn:hover {
+            background: #dd7711;
+            transform: translateY(-2px);
+        }
         .form-actions {
             display: grid;
             grid-template-columns: 1fr;
@@ -619,19 +636,40 @@
                                 <option value="خارج الكراج"> خارج الكراج</option>
                             </select>
                         </div>
-                        <div class="form-group full-width" id="detailsGroup" style="display: none;">
-                            <label for="detailedLocation">
+                        <div class="form-group full-width" id="locationDetailsGroup" style="display: none;">
+                            <label for="locationDetails">
                                 الموقع التفصيلي
+                            </label>
+                            <input 
+                                type="text" 
+                                id="locationDetails" 
+                                name="locationDetails"
+                                placeholder="أدخل اسم المدينة أو المنطقة، مثال: عرعر"
+                            >
+                            <div class="help-text">
+                                <span>🏙️</span>
+                                <span>أدخل اسم المدينة أو المنطقة (مثال: عرعر، الرياض، جدة)</span>
+                            </div>
+                        </div>
+                        <div class="form-group full-width" id="coordinatesGroup" style="display: none;">
+                            <label for="coordinates">
+                                الإحداثيات
                             </label>
                             <div class="input-group">
                                 <input 
                                     type="text" 
-                                    id="detailedLocation" 
-                                    name="detailedLocation"
-                                    placeholder="الصق رابط الموقع أو استخدم زر تحديد الموقع"
+                                    id="coordinates" 
+                                    name="coordinates"
+                                    placeholder="الصق رابط الموقع أو استخدم أحد الأزرار أدناه"
                                 >
                                 <button type="button" class="input-btn" id="getLocationBtn" title="تحديد موقعي الحالي">
                                 </button>
+                                <button type="button" class="paste-btn" id="pasteCoordinatesBtn" title="لصق الإحداثيات">
+                                </button>
+                            </div>
+                            <div class="help-text">
+                                <span>📍</span>
+                                <span>استخدم زر تحديد الموقع للحصول على الإحداثيات تلقائياً، أو زر اللصق للصق رابط الموقع</span>
                             </div>
                         </div>
                         <div class="form-group full-width" id="phoneGroup" style="display: none;">
@@ -710,7 +748,7 @@
     <script>
         // Configuration
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbymRaHFUJekEzPSgK6BOkO5aMiMBJY6vFajjnCcYtHg7S7ECDsONzCeMLPdY50xRjw7/exec'
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyzTrS7yV1Ls7cbJprH7cDsaESp7Wgh8Y9dQXoWFDX9Gii_QJ71bKV-PCtWEtCHFE-M/exec'
         };
 
         // متغير لحفظ بيانات البلاغ الأخير
@@ -740,16 +778,22 @@
             });
             // Location Change
             document.getElementById('location').addEventListener('change', function() {
-                const detailsGroup = document.getElementById('detailsGroup');
+                const locationDetailsGroup = document.getElementById('locationDetailsGroup');
+                const coordinatesGroup = document.getElementById('coordinatesGroup');
                 const phoneGroup = document.getElementById('phoneGroup');
                 const showDetails = this.value === 'خارج الكراج';
-                detailsGroup.style.display = showDetails ? 'block' : 'none';
+                
+                locationDetailsGroup.style.display = showDetails ? 'block' : 'none';
+                coordinatesGroup.style.display = showDetails ? 'block' : 'none';
                 phoneGroup.style.display = showDetails ? 'block' : 'none';
+                
                 const phoneInput = document.getElementById('phoneNumber');
                 phoneInput.required = showDetails;
             });
             // Get Location Button
             document.getElementById('getLocationBtn').addEventListener('click', getCurrentLocation);
+            // Paste Coordinates Button
+            document.getElementById('pasteCoordinatesBtn').addEventListener('click', pasteCoordinates);
             // Form Submit
             document.getElementById('reportForm').addEventListener('submit', handleSubmit);
             // Input sanitization
@@ -787,16 +831,70 @@
                 (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    document.getElementById('detailedLocation').value = 
+                    document.getElementById('coordinates').value = 
                         `https://www.google.com/maps?q=${lat},${lon}`;
                     showLoading(false);
-                    showToast('تم إضافة الموقع بنجاح ✅', 'success');
+                    showToast('تم إضافة الإحداثيات بنجاح ✅', 'success');
                 },
                 (error) => {
                     showLoading(false);
                     showToast('فشل تحديد الموقع. تحقق من أذونات الموقع', 'error');
                 }
             );
+        }
+
+        // دالة جديدة للصق الإحداثيات
+        async function pasteCoordinates() {
+            try {
+                // ✅ تعيين الموقع تلقائيًا إلى "خارج الكراج"
+                const locationSelect = document.getElementById('location');
+                if (locationSelect.value !== 'خارج الكراج') {
+                    locationSelect.value = 'خارج الكراج';
+                    // ✅ تشغيل حدث change لعرض الحقول المطلوبة
+                    const event = new Event('change', { bubbles: true });
+                    locationSelect.dispatchEvent(event);
+                }
+
+                // طلب إذن للوصول إلى الحافظة
+                const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+                if (permission.state === 'denied') {
+                    showToast('الوصول إلى الحافظة مرفوض. يرجى منح الإذن', 'error');
+                    return;
+                }
+
+                // قراءة النص من الحافظة
+                const clipboardText = await navigator.clipboard.readText();
+                
+                if (!clipboardText) {
+                    showToast('لا يوجد نص في الحافظة', 'error');
+                    return;
+                }
+
+                // التحقق من أن النص يحتوي على رابط خرائط أو إحداثيات
+                const isGoogleMapsLink = clipboardText.includes('maps.google') || 
+                                       clipboardText.includes('google.com/maps') ||
+                                       clipboardText.includes('goo.gl/maps');
+                
+                const hasCoordinates = /[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+/.test(clipboardText);
+
+                if (isGoogleMapsLink || hasCoordinates) {
+                    document.getElementById('coordinates').value = clipboardText;
+                    showToast('تم لصق الإحداثيات بنجاح ✅', 'success');
+                } else {
+                    showToast('النص المنسوخ لا يحتوي على إحداثيات أو رابط خرائط صالح', 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في لصق الإحداثيات:', error);
+                
+                // طريقة بديلة للهواتف التي لا تدعم Clipboard API
+                if (error.name === 'NotAllowedError' || error.name === 'NotSupportedError') {
+                    const coordinatesInput = document.getElementById('coordinates');
+                    coordinatesInput.focus();
+                    showToast('يرجى استخدام Ctrl+V أو لمس الحقل للصق الإحداثيات يدوياً', 'info');
+                } else {
+                    showToast('فشل في لصق الإحداثيات. تحقق من أذونات المتصفح', 'error');
+                }
+            }
         }
 
         function getFormData() {
@@ -809,7 +907,14 @@
             if (data.faultType === 'أخرى' && data.otherType) {
                 data.faultType = data.otherType;
             }
+            
+            // دمج بيانات الموقع إذا كان خارج الكراج
+            if (data.location === 'خارج الكراج' && data.locationDetails) {
+                data.location = `خارج الكراج - ${data.locationDetails}`;
+            }
+            
             delete data.otherType;
+            delete data.locationDetails;
             return data;
         }
 
@@ -829,6 +934,10 @@
                 errors.push('يجب اختيار الموقع');
             }
             if (data.location === 'خارج الكراج') {
+                const locationDetails = document.getElementById('locationDetails').value;
+                if (!locationDetails || locationDetails.trim() === '') {
+                    errors.push('يجب إدخال الموقع التفصيلي (اسم المدينة أو المنطقة)');
+                }
                 if (!data.phoneNumber || !/^(05)[0-9]{8}$/.test(data.phoneNumber)) {
                     errors.push('رقم الجوال يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام');
                 }
@@ -922,13 +1031,14 @@
                 </div>
             `;
             
-            if (data.location === 'خارج الكراج') {
-                if (data.detailedLocation) {
+            if (data.location.includes('خارج الكراج')) {
+                const coordinates = document.getElementById('coordinates').value;
+                if (coordinates) {
                     detailsHTML += `
                         <div class="detail-item">
-                            <div class="detail-label">🌍 الرابط</div>
+                            <div class="detail-label">🌍 الإحداثيات</div>
                             <div class="detail-value">
-                                <a href="${data.detailedLocation}" target="_blank">${data.detailedLocation}</a>
+                                <a href="${coordinates}" target="_blank">${coordinates}</a>
                             </div>
                         </div>
                     `;
@@ -965,13 +1075,14 @@
             // إعادة تعيين النموذج
             document.getElementById('reportForm').reset();
             document.getElementById('otherTypeGroup').style.display = 'none';
-            document.getElementById('detailsGroup').style.display = 'none';
+            document.getElementById('locationDetailsGroup').style.display = 'none';
+            document.getElementById('coordinatesGroup').style.display = 'none';
             document.getElementById('phoneGroup').style.display = 'none';
         }
 
         function generateWhatsAppMessage(data, reportNumber, timeStr) {
             let message = '';
-            if (data.location === 'داخل الكراج') {
+            if (data.location.includes('داخل الكراج')) {
                 message = `🔔 *بلاغ جديد تم تسجيله (داخل الكراج)*\n\n`;
                 message += `🚍 *رقم البلاغ:* ${reportNumber}\n`;
                 message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
@@ -982,14 +1093,16 @@
                 message += `🕓 *وقت الإنشاء:* ${timeStr}\n\n`;
                 message += `⚙ *تم إنشاء البلاغ عبر نظام ادارة البلاغات*`;
             } else {
-                message = `🔔 *بلاغ جديد تم تسجيله (خارج الكراج)*\n\n`;
+                message = `🔔 *بلاغ جديد تم تسجيله (${data.location})*\n\n`;
                 message += `🚍 *رقم البلاغ:* ${reportNumber}\n`;
                 message += `🚌 *رقم الحافلة:* ${data.busNumber}\n`;
                 message += `🔧 *نوع العطل:* ${data.faultType}\n`;
                 message += `📝 *الوصف:* ${data.faultDescription}\n`;
                 message += `📍 *الموقع:* ${data.location}\n`;
-                if (data.detailedLocation) {
-                    message += `🌍 *الرابط:* ${data.detailedLocation}\n`;
+                
+                const coordinates = document.getElementById('coordinates').value;
+                if (coordinates) {
+                    message += `🌍 *الإحداثيات:* ${coordinates}\n`;
                 }
                 if (data.phoneNumber) {
                     message += `📞 *الجوال:* ${data.phoneNumber}\n`;
