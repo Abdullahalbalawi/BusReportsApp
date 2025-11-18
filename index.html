@@ -583,7 +583,7 @@
                         <div class="form-group full-width">
                             <label for="faultDescription">
                                 <span class="required">*</span>
-                                وصف العطل
+                                الوصف
                             </label>
                             <textarea 
                                 id="faultDescription" 
@@ -726,7 +726,7 @@
     <script>
         // Configuration
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyal3an9uWsJjaC2Xhylg86Cl7IJKwvgMaTaDyFWqVDXVZ-kk3_OJVl0ZcB1fsAnXil/exec'
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwa8A1JayUHxJ9Y3KXTY8PHsDZjtO0W1y50rA7ZNZz0maZ2IB8FBAS_emF9-jaPeMsW0Q/exec'
         };
 
         // متغير لحفظ بيانات البلاغ الأخير
@@ -850,7 +850,7 @@
                 errors.push('يجب اختيار نوع العطل');
             }
             if (!data.faultDescription || data.faultDescription.trim().length < 5) {
-                errors.push('وصف العطل يجب أن يكون 10 أحرف على الأقل');
+                errors.push('الوصف يجب أن يكون 10 أحرف على الأقل');
             }
             if (!data.location) {
                 errors.push('يجب اختيار الموقع');
@@ -944,7 +944,7 @@
                     <div class="detail-value">${data.faultType}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">📝 وصف العطل</div>
+                    <div class="detail-label">📝 الوصف</div>
                     <div class="detail-value">${data.faultDescription}</div>
                 </div>
                 <div class="detail-item">
@@ -1008,7 +1008,7 @@
             message += `*رقم البلاغ:* ${reportNumber}\n`;
             message += `*رقم الحافلة:* ${data.busNumber}\n`;
             message += `*نوع العطل:* ${data.faultType}\n`;
-            message += `*وصف العطل:* ${data.faultDescription}\n`;
+            message += `*الوصف:* ${data.faultDescription}\n`;
             message += `*الموقع:* ${data.location}\n`;
             
             if (data.location.includes('خارج الكراج')) {
