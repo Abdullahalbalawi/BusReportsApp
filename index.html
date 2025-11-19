@@ -726,7 +726,7 @@
     <script>
         // Configuration
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxN5s0icdPkZhC8CU7Ilb0GM0ZqisRTyMsdlQthxoeb6ojHC5m5iQNyUzlSxXXCUzNwUA/exec'
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwCp-Dy3RgxrOjmbPf8q6juRI0Egpxc1p6MBwkV7iVRMzxQJZq_wg-8TY-xYr4xSWWX/exec'
         };
 
         // متغير لحفظ بيانات البلاغ الأخير
@@ -1003,31 +1003,27 @@
         }
 
         function generateWhatsAppMessage(data, reportNumber, timeStr) {
-            let message = `*بلاغ عطل حافلة*\n`;
-            message += `═══════════════════\n`;
-            message += `*رقم البلاغ:* ${reportNumber}\n`;
-            message += `*رقم الحافلة:* ${data.busNumber}\n`;
-            message += `*نوع العطل:* ${data.faultType}\n`;
-            message += `*الوصف:* ${data.faultDescription}\n`;
-            message += `*الموقع:* ${data.location}\n`;
-            
-            if (data.location.includes('خارج الكراج')) {
-                const coordinates = document.getElementById('coordinates').value;
-                if (coordinates) {
-                    message += `*الإحداثيات:* ${coordinates}\n`;
-                }
-                if (data.phoneNumber) {
-                    message += `*الجوال:* ${data.phoneNumber}\n`;
-                }
-            }
-            
-            message += `*مستوى الأهمية:* ${data.priority}\n`;
-            message += `*وقت الإنشاء:* ${timeStr}\n`;
-            message += `═══════════════════\n`;
-            message += `_تم إنشاء البلاغ بواسطة نظام إدارة البلاغات_`;
-            
-            return message;
+    let message = ``;
+    message += `*رقم الحافلة:* ${data.busNumber}\n`;
+    message += `*نوع العطل:* ${data.faultType}\n`;
+    message += `*الوصف:* ${data.faultDescription}\n`;
+    message += `*الموقع:* ${data.location}\n`;
+    
+    if (data.location.includes('خارج الكراج')) {
+        const coordinates = document.getElementById('coordinates').value;
+        if (coordinates) {
+            message += `*الإحداثيات:* ${coordinates}\n`;
         }
+        if (data.phoneNumber) {
+            message += `*الجوال:* ${data.phoneNumber}\n`;
+        }
+    }
+    
+    message += `*مستوى الأهمية:* ${data.priority}\n`;
+    message += `*وقت الإنشاء:* ${timeStr}\n`;
+    
+    return message;
+}
 
         function updateMessage() {
             const newMessage = document.getElementById('messageEditor').value;
