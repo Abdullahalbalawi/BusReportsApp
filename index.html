@@ -489,9 +489,139 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* زر تبديل الوضع الداكن */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: #667eea;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* الوضع الداكن */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        body.dark-mode .container {
+            background: #1e1e2f;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        body.dark-mode header {
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+        }
+        body.dark-mode .form-section {
+            background: #2a2a3d;
+            border-color: #3d3d5c;
+        }
+        body.dark-mode .form-section:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        body.dark-mode .section-title {
+            color: #e2e8f0;
+        }
+        body.dark-mode label {
+            color: #e2e8f0;
+        }
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="tel"],
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #1e1e2f;
+            border-color: #3d3d5c;
+            color: #e2e8f0;
+        }
+        body.dark-mode input[type="text"]:focus,
+        body.dark-mode input[type="tel"]:focus,
+        body.dark-mode select:focus,
+        body.dark-mode textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        body.dark-mode input::placeholder {
+            color: #718096;
+        }
+        body.dark-mode .help-text {
+            color: #a0aec0;
+        }
+        body.dark-mode .form-actions {
+            border-top-color: #3d3d5c;
+        }
+        body.dark-mode .toast {
+            background: #2a2a3d;
+            color: #e2e8f0;
+        }
+        body.dark-mode .loading-content {
+            background: #2a2a3d;
+            color: #e2e8f0;
+        }
+        body.dark-mode .modal-content {
+            background: #1e1e2f;
+        }
+        body.dark-mode .modal-header {
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+        }
+        body.dark-mode .modal-body {
+            color: #e2e8f0;
+        }
+        body.dark-mode .detail-item {
+            background: #2a2a3d;
+        }
+        body.dark-mode .detail-label {
+            color: #e2e8f0;
+        }
+        body.dark-mode .detail-value {
+            color: #a0aec0;
+        }
+        body.dark-mode .message-editor {
+            background: #2a2a3d;
+            border-color: #3d3d5c;
+        }
+        body.dark-mode .message-editor h4 {
+            color: #e2e8f0;
+        }
+        body.dark-mode .message-textarea {
+            background: #1e1e2f;
+            border-color: #3d3d5c;
+            color: #e2e8f0;
+        }
+        body.dark-mode .modal-actions {
+            border-top-color: #3d3d5c;
+        }
+        body.dark-mode .modal-note {
+            background: #3d2a2a;
+            border-color: #5c3d3d;
+            color: #f56565;
+        }
+        body.dark-mode .theme-toggle {
+            background: #2a2a3d;
+            color: #ffd93d;
+        }
     </style>
 </head>
 <body>
+    <!-- زر تبديل الوضع الداكن -->
+    <button class="theme-toggle" onclick="toggleDarkMode()" title="تبديل الوضع الداكن">
+        <span id="themeIcon">🔅</span>
+    </button>
+
     <div class="container">
         <header>
             <h1><i class="fas fa-bus"></i> نظام إدارة تسجيل البلاغات</h1>
@@ -565,6 +695,7 @@
                                 <option value="إطارات">🧿 إطارات</option>
                                 <option value="فرامل">🛑 فرامل</option>
                                 <option value="محرك">🔧 محرك</option>
+                                <option value="أبواب">🚌 أبواب</option>
                                 <option value="مخالفة تطوير">🟣 مخالفة تطوير</option>
                                 <option value="أعطال متعددة">📋 أعطال متعددة</option>
                             </select>
@@ -1082,6 +1213,34 @@
                 toast.classList.remove('show');
             }, 5000);
         }
+
+        // دالة تبديل الوضع الداكن
+        function toggleDarkMode() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = '🔆';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                themeIcon.textContent = '🔅';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        }
+
+        // تحميل تفضيل الوضع الداكن عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkMode = localStorage.getItem('darkMode');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                themeIcon.textContent = '🔆';
+            }
+        });
     </script>
 </body>
 </html>
+
